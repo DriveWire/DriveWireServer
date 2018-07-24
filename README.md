@@ -43,7 +43,7 @@ Currently, as this only implements the server functionality, the best way to get
 
 ```
 cd build/libs
-java -jar DriveWireServer-4.4.0-capsule.jar --config=\<path\_to\_config\>
+java -jar DriveWireServer-4.4.0-capsule.jar --config=<path_to_config>
 ```
 
 ## Contributing

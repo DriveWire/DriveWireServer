@@ -1,4 +1,4 @@
-# Project Title
+# DriveWire Server
 
 This project is a refactor of the Color Computer [DriveWire 4](https://sites.google.com/site/drivewire4/) project. For now, this project is in an experimental stage, and is likely to change significantly.
 
@@ -11,7 +11,7 @@ These instructions will get you a copy of the project up and running on your loc
 In order to build DriveWire 4, the following software is required:
 * Java JVM >= 1.8 ([Oracle JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html))
 * Gradle ([Gradle](https://gradle.org/install/))
-* GIT ([GIT](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* GIT ([GIT](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git))
 
 
 ### Installing
@@ -57,7 +57,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 * **Aaron Wolfe**, **Boisy Pitre**, **Christopher Hawks**, **Jim Hathaway**, **Neil Andrew Cook**, **Tim Lindner**, **Tormod Volden**, **Wayne Campbell** - The original authors of DriveWire
 
-* **Nathan Byrd** - [CognitiveGears](https://github.com/cognitivegears))
+* **Nathan Byrd** - [CognitiveGears](https://github.com/cognitivegears)
 
 See also the list of [contributors](https://github.com/DriveWire/DriveWireServer/contributors) who participated in this project.
 

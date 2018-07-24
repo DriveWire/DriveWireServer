@@ -1,0 +1,33 @@
+plugins {
+  id "us.kirchmeier.capsule" version "1.0.2"
+}
+
+version = '4.4.0'
+apply plugin: 'java'
+sourceCompatibility = 1.8
+
+defaultTasks 'clean', 'build', 'fatCapsule'
+
+repositories {
+	mavenCentral()
+}
+
+task fatCapsule(type: FatCapsule) {
+	applicationClass 'com.groupunix.drivewireserver.DriveWireServer'
+	baseName 'DriveWireServer'
+    	capsuleManifest {
+        	minJavaVersion = '1.8.0'
+    	}
+}
+
+dependencies {
+	compile 'org.slf4j:slf4j-log4j12:1.8.0-beta2'
+	compile 'org.apache.commons:commons-vfs2:2.2'
+	compile 'commons-configuration:commons-configuration:1.10'
+    compile 'net.htmlparser.jericho:jericho-html:3.4'
+    compile 'org.ostermiller:utils:1.07.00'
+    compile 'commons-cli:commons-cli:1.4'
+    compile 'org.apache.commons:commons-collections4:4.2'
+    compile 'com.fazecast:jSerialComm:2.0.2'
+	compile 'commons-collections:commons-collections:3.2.1'
+}

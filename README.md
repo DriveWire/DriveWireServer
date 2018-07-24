@@ -39,9 +39,11 @@ gradle clean build fatCapsule
 
 ## Running the application
 
+Currently, as this only implements the server functionality, the best way to get a configuration file setup is to run the existing DriveWire 4 UI, execute the wizard, then copy the created config.xml file and point to it using the --config option:
+
 ```
 cd build/libs
-java -jar DriveWireServer-4.4.0-capsule.jar --noui
+java -jar DriveWireServer-4.4.0-capsule.jar --config=\<path\_to\_config\>
 ```
 
 ## Contributing

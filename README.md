@@ -6,6 +6,8 @@ This project is a refactor of the Color Computer [DriveWire 4](https://sites.goo
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
+*Note* If you do not plan to build DriveWireServer, but just want to run it, jump to [Running the application](#running-the-application)
+
 ### Development Prerequisites
 
 In order to build DriveWire 4, the following software is required:
@@ -37,7 +39,7 @@ gradle clean build fatCapsule
 ```
 
 
-## Running the application
+# Running the application
 
 Build using the steps above, or download the [Pre-built binary](https://github.com/DriveWire/DriveWireServer/releases/download/4.4.0-alpha1/DriveWireServer-4.4.0-capsule.jar)
 

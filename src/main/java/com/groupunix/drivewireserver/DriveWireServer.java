@@ -79,10 +79,6 @@ public class DriveWireServer {
     private static boolean noMount = false;
     private static boolean configFreeze = false;
 
-    @SuppressWarnings("unused")
-    private static boolean noUI = false;
-    @SuppressWarnings("unused")
-    private static boolean noServer = false;
 
     @SuppressWarnings("unused")
     private static boolean restart_logging = false;
@@ -280,14 +276,6 @@ public class DriveWireServer {
             // apply settings to logger
             applyLoggingSettings();
 	        
-	        /* not needed with NRSerialJava
-	    	// Try to add native rxtx to lib path
-			if (serverconfig.getBoolean("LoadRXTX",true))
-			{
-			   loadRXTX();
-			}
-			*/
-
 
 
             // add server config listener
@@ -398,59 +386,6 @@ public class DriveWireServer {
 
 
 
-    @SuppressWarnings("unused")
-    private static void loadRXTX() {
-
-        try {
-            String rxtxpath;
-
-            if (!serverconfig.getString("LoadRXTXPath", "").equals("")) {
-                rxtxpath = serverconfig.getString("LoadRXTXPath");
-            }
-            else {
-                // look for native/x/x in current dir
-                File curdir = new File(".");
-                rxtxpath = curdir.getCanonicalPath();
-
-                // 	+ native platform dir
-                String[] osparts = System.getProperty("os.name").split(" ");
-
-                if (osparts.length < 1) {
-                    throw new DWPlatformUnknownException("No native dir for os '" + System.getProperty("os.name") + "' arch '" + System.getProperty("os.arch") + "'");
-                }
-
-                rxtxpath += File.separator + "native" + File.separator + osparts[0] + File.separator + System.getProperty("os.arch");
-            }
-
-            File testrxtxpath = new File(rxtxpath);
-            logger.debug("Using rxtx lib path: " + rxtxpath);
-
-            if (!testrxtxpath.exists()) {
-                throw new DWPlatformUnknownException("No native dir for os '" + System.getProperty("os.name") + "' arch '" + System.getProperty("os.arch") + "'");
-            }
-
-            // add this dir to path..
-            System.setProperty("java.library.path", System.getProperty("java.library.path") + File.pathSeparator + rxtxpath);
-
-            //set sys_paths to null so they will be reread by jvm
-            Field sysPathsField;
-            sysPathsField = ClassLoader.class.getDeclaredField("sys_paths");
-            sysPathsField.setAccessible(true);
-            sysPathsField.set(null, null);
-
-        }
-        catch (Exception e) {
-            logger.fatal(e.getClass().getSimpleName() + ": " + e.getLocalizedMessage());
-
-            if (useDebug) {
-                System.out.println("--------------------------------------------------------------------------------");
-                e.printStackTrace();
-                System.out.println("--------------------------------------------------------------------------------");
-            }
-
-        }
-
-    }
 
 
     private static void initLogging() {
@@ -482,9 +417,6 @@ public class DriveWireServer {
         cmdoptions.addOption("debug", false, "log extra info to console");
         cmdoptions.addOption("nomidi", false, "disable MIDI");
         cmdoptions.addOption("nomount", false, "do not remount disks from last run");
-        cmdoptions.addOption("noui", false, "do not start user interface");
-        cmdoptions.addOption("noserver", false, "do not start server");
-        cmdoptions.addOption("liteui", false, "use lite user interface");
 
 
         CommandLineParser parser = new GnuParser();
@@ -525,13 +457,6 @@ public class DriveWireServer {
                 noMount = true;
             }
 
-            if (line.hasOption("noui")) {
-                noUI = true;
-            }
-
-            if (line.hasOption("noserver")) {
-                noServer = true;
-            }
 
 
         }

@@ -1,9 +1,14 @@
 plugins {
+  id "java"
   id "us.kirchmeier.capsule" version "1.0.2"
 }
 
+if(!(org.gradle.api.JavaVersion.current().isJava8Compatible())) {
+  // The build script (this file) requires Java 8+
+  ant.fail("This build script requires Java version 8+, please check java version or upgrade java.")
+}
+
 version = '4.4.0'
-apply plugin: 'java'
 sourceCompatibility = 1.8
 
 defaultTasks 'clean', 'build', 'fatCapsule'

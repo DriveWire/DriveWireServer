@@ -3,13 +3,12 @@ package com.groupunix.drivewireserver.dwcommands;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.groupunix.drivewireserver.DWDefs;
-import com.groupunix.drivewireserver.dwprotocolhandler.DWProtocol;
 
 
 public class DWCmdServerShowSerial extends DWCommand {
 
 
-    DWCmdServerShowSerial(DWProtocol dwProto, DWCommand parent) {
+    DWCmdServerShowSerial(DWCommand parent) {
 
         setParentCmd(parent);
     }
@@ -29,76 +28,76 @@ public class DWCmdServerShowSerial extends DWCommand {
     }
 
     public DWCommandResponse parse(String cmdline) {
-        String text = new String();
+        StringBuilder text = new StringBuilder();
 
-        text += "Server serial devices:\r\n\r\n";
+        text.append("Server serial devices:\r\n\r\n");
 
         for (SerialPort serialPort : SerialPort.getCommPorts()) {
             try {
-                text += serialPort.getSystemPortName() + "  ";
+                text.append(serialPort.getSystemPortName()).append("  ");
 
                 serialPort.openPort(2000);
 
-                text += serialPort.getBaudRate() + " bps  ";
-                text += serialPort.getNumDataBits();
+                text.append(serialPort.getBaudRate()).append(" bps  ");
+                text.append(serialPort.getNumDataBits());
 
 
                 switch (serialPort.getParity()) {
                     case SerialPort.NO_PARITY:
-                        text += "N";
+                        text.append("N");
                         break;
 
                     case SerialPort.EVEN_PARITY:
-                        text += "E";
+                        text.append("E");
                         break;
 
                     case SerialPort.MARK_PARITY:
-                        text += "M";
+                        text.append("M");
                         break;
 
                     case SerialPort.ODD_PARITY:
-                        text += "O";
+                        text.append("O");
                         break;
 
                     case SerialPort.SPACE_PARITY:
-                        text += "S";
+                        text.append("S");
                         break;
 
                 }
 
 
-                text += serialPort.getNumStopBits();
+                text.append(serialPort.getNumStopBits());
 
                 if (serialPort.getFlowControlSettings() == SerialPort.FLOW_CONTROL_DISABLED) {
-                    text += "  No flow control  ";
+                    text.append("  No flow control  ");
                 }
                 else {
-                    text += "  ";
+                    text.append("  ");
 
                     if ((serialPort.getFlowControlSettings() & SerialPort.FLOW_CONTROL_RTS_ENABLED) == SerialPort.FLOW_CONTROL_RTS_ENABLED) {
-                        text += "RTS  ";
+                        text.append("RTS  ");
                     }
 
                     if ((serialPort.getFlowControlSettings() & SerialPort.FLOW_CONTROL_CTS_ENABLED) == SerialPort.FLOW_CONTROL_CTS_ENABLED) {
-                        text += "CTS  ";
+                        text.append("CTS  ");
                     }
 
                     if ((serialPort.getFlowControlSettings() & SerialPort.FLOW_CONTROL_XONXOFF_IN_ENABLED) == SerialPort.FLOW_CONTROL_XONXOFF_IN_ENABLED) {
-                        text += "In: XOn/XOff  ";
+                        text.append("In: XOn/XOff  ");
                     }
 
                     if ((serialPort.getFlowControlSettings() & SerialPort.FLOW_CONTROL_XONXOFF_OUT_ENABLED) == SerialPort.FLOW_CONTROL_XONXOFF_OUT_ENABLED) {
-                        text += "Out: XOn/XOff  ";
+                        text.append("Out: XOn/XOff  ");
                     }
                 }
 
 
-                text += " CTS:" + yn(serialPort.getCTS());
+                text.append(" CTS:").append(yn(serialPort.getCTS()));
 
-                text += " DSR:" + yn(serialPort.getDSR());
+                text.append(" DSR:").append(yn(serialPort.getDSR()));
 
 
-                text += "\r\n";
+                text.append("\r\n");
 
                 serialPort.closePort();
 
@@ -110,7 +109,7 @@ public class DWCmdServerShowSerial extends DWCommand {
         }
 
 
-        return (new DWCommandResponse(text));
+        return (new DWCommandResponse(text.toString()));
     }
 
     private String yn(boolean cd) {

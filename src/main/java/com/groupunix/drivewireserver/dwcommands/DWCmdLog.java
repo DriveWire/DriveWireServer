@@ -4,55 +4,44 @@ import com.groupunix.drivewireserver.dwprotocolhandler.DWProtocol;
 
 public class DWCmdLog extends DWCommand {
 
-	static final String command = "log";
-	private DWCommandList commands;
-	private DWProtocol dwProto;	
-	
-	public DWCmdLog(DWProtocol dwProto,DWCommand parent)
-	{
-		setParentCmd(parent);
-		this.dwProto = dwProto;
-		
-		commands = new DWCommandList(this.dwProto, this.dwProto.getCMDCols());
-		commands.addcommand(new DWCmdLogShow(this));
-		
-	}
+    static final String command = "log";
+    private final DWCommandList commands;
 
-	
-	public String getCommand() 
-	{
-		return command;
-	}
+    DWCmdLog(DWProtocol dwProto, DWCommand parent) {
+        setParentCmd(parent);
 
-	public DWCommandList getCommandList()
-	{
-		return(this.commands);
-	}
-	
-	public DWCommandResponse parse(String cmdline)
-	{
-		if (cmdline.length() == 0)
-		{
-			return(new DWCommandResponse(this.commands.getShortHelp()));
-		}
-		return(commands.parse(cmdline));
-	}
+        commands = new DWCommandList(dwProto, dwProto.getCMDCols());
+        commands.addcommand(new DWCmdLogShow(this));
+
+    }
 
 
+    public String getCommand() {
+        return command;
+    }
 
-	public String getShortHelp() 
-	{
-		return "View the server log";
-	}
+    public DWCommandList getCommandList() {
+        return (this.commands);
+    }
+
+    public DWCommandResponse parse(String cmdline) {
+        if (cmdline.length() == 0) {
+            return (new DWCommandResponse(this.commands.getShortHelp()));
+        }
+        return (commands.parse(cmdline));
+    }
 
 
-	public String getUsage() 
-	{
-		return "dw log [command]";
-	}
-	
-	public boolean validate(String cmdline) 
-	{
-		return(commands.validate(cmdline));
-	}
+    public String getShortHelp() {
+        return "View the server log";
+    }
+
+
+    public String getUsage() {
+        return "dw log [command]";
+    }
+
+    public boolean validate(String cmdline) {
+        return (commands.validate(cmdline));
+    }
 }

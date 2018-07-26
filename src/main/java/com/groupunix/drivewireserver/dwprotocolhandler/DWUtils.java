@@ -36,8 +36,9 @@ public class DWUtils {
     public static byte[] reverseByteArray(byte[] data) {
         byte[] revdata = new byte[data.length];
 
-        for (int i = 0; i < data.length; i++)
+        for (int i = 0; i < data.length; i++) {
             revdata[i] = reverseByte(data[i]);
+        }
 
         return (revdata);
     }
@@ -69,7 +70,9 @@ public class DWUtils {
 
         if (in == null || in.length <= 0)
 
+        {
             return null;
+        }
 
 
         String pseudo[] = {"0", "1", "2",
@@ -101,9 +104,7 @@ public class DWUtils {
 
         }
 
-        String rslt = new String(out);
-
-        return rslt;
+        return new String(out);
 
     }
 
@@ -454,7 +455,7 @@ public class DWUtils {
 
 
     public static ArrayList<String> getPortNames() {
-        ArrayList<String> ports = new ArrayList<String>();
+        ArrayList<String> ports = new ArrayList<>();
 
         for (SerialPort serialPort : SerialPort.getCommPorts()) {
             ports.add(serialPort.getSystemPortName());
@@ -465,10 +466,10 @@ public class DWUtils {
 
     public static String midimsgToText(int statusbyte, int data1, int data2) {
         // make midi messages into something humans can read..
-        String action = new String();
-        String chan = new String();
-        String d1 = new String();
-        String d2 = new String();
+        String action;
+        String chan = "";
+        String d1 = "";
+        String d2 = "";
 
         if ((statusbyte >= 128) && (statusbyte <= 143)) {
             action = "Note off";
@@ -533,21 +534,21 @@ public class DWUtils {
     public static String dropFirstToken(String txt) {
         // drop first token in string
 
-        String rest = new String();
+        StringBuilder rest = new StringBuilder();
 
         String[] tokens = txt.split(" ");
 
         for (int x = 1; x < tokens.length; x++) {
             if (rest.length() > 0) {
-                rest = rest + " " + tokens[x];
+                rest.append(" ").append(tokens[x]);
             }
             else {
-                rest = tokens[x];
+                rest = new StringBuilder(tokens[x]);
             }
 
         }
 
-        return (rest);
+        return (rest.toString());
     }
 
 
@@ -559,23 +560,21 @@ public class DWUtils {
     }
 
     public static boolean isStringFalse(String tf) {
-        if (tf.equalsIgnoreCase("false"))
+        if (tf.equalsIgnoreCase("false")) {
             return true;
+        }
 
-        if (tf.equalsIgnoreCase("off"))
-            return true;
+        return tf.equalsIgnoreCase("off");
 
-        return false;
     }
 
     public static boolean isStringTrue(String tf) {
-        if (tf.equalsIgnoreCase("true"))
+        if (tf.equalsIgnoreCase("true")) {
             return true;
+        }
 
-        if (tf.equalsIgnoreCase("on"))
-            return true;
+        return tf.equalsIgnoreCase("on");
 
-        return false;
     }
 
     public static boolean testClassPath(String fullClassName) {
@@ -622,32 +621,41 @@ public class DWUtils {
         File fromFile = new File(fromFileName);
         File toFile = new File(toFileName);
 
-        if (!fromFile.exists())
+        if (!fromFile.exists()) {
             throw new IOException("no source file: " + fromFileName);
-        if (!fromFile.isFile())
+        }
+        if (!fromFile.isFile()) {
             throw new IOException("can't copy directory: " + fromFileName);
-        if (!fromFile.canRead())
+        }
+        if (!fromFile.canRead()) {
             throw new IOException("source file is unreadable: " + fromFileName);
+        }
 
-        if (toFile.isDirectory())
+        if (toFile.isDirectory()) {
             toFile = new File(toFile, fromFile.getName());
+        }
 
         if (toFile.exists()) {
-            if (!toFile.canWrite())
+            if (!toFile.canWrite()) {
                 throw new IOException("destination file is unwriteable: " + toFileName);
+            }
 
             String parent = toFile.getParent();
-            if (parent == null)
+            if (parent == null) {
                 parent = System.getProperty("user.dir");
+            }
 
             File dir = new File(parent);
-            if (!dir.exists())
+            if (!dir.exists()) {
                 throw new IOException("destination directory doesn't exist: " + parent);
+            }
 
-            if (dir.isFile())
+            if (dir.isFile()) {
                 throw new IOException("destination is not a directory: " + parent);
-            if (!dir.canWrite())
+            }
+            if (!dir.canWrite()) {
                 throw new IOException("destination directory is unwriteable: " + parent);
+            }
         }
 
         FileInputStream from = null;
@@ -658,24 +666,25 @@ public class DWUtils {
             byte[] buffer = new byte[4096];
             int bytesRead;
 
-            while ((bytesRead = from.read(buffer)) != -1)
+            while ((bytesRead = from.read(buffer)) != -1) {
                 to.write(buffer, 0, bytesRead); // write
+            }
         }
         finally {
-            if (from != null)
+            if (from != null) {
                 try {
                     from.close();
                 }
-                catch (IOException e) {
-                    ;
+                catch (IOException ignored) {
                 }
-            if (to != null)
+            }
+            if (to != null) {
                 try {
                     to.close();
                 }
-                catch (IOException e) {
-                    ;
+                catch (IOException ignored) {
                 }
+            }
         }
     }
 
@@ -705,8 +714,9 @@ public class DWUtils {
                 res += "|" + f.lastModified();
                 res += "|" + f.isDirectory();
             }
-            else
+            else {
                 res += "|0|0|true";
+            }
 
 
         }
@@ -755,24 +765,29 @@ public class DWUtils {
 
         // is directory
 
-        if (f.isDirectory())
+        if (f.isDirectory()) {
             res[pos++] = (byte) 1;
-        else
+        }
+        else {
             res[pos++] = (byte) 0;
+        }
 
         // is readonly
 
-        if (f.canWrite())
+        if (f.canWrite()) {
             res[pos++] = (byte) 0;
-        else
+        }
+        else {
             res[pos++] = (byte) 1;
+        }
 
         // name length
 
         res[pos++] = (byte) f.getName().length();
 
-        for (int i = 0; i < f.getName().length(); i++)
+        for (int i = 0; i < f.getName().length(); i++) {
             res[pos++] = f.getName().getBytes()[i];
+        }
 
 
         System.out.println(f.getName() + "\t" + f.getName().length() + "\t" + f.length());
@@ -785,19 +800,19 @@ public class DWUtils {
 
     public String cocoString(byte[] bytes) {
         // return string from 6809 style string
-        String ret = new String();
+        StringBuilder ret = new StringBuilder();
 
         int i = 0;
 
         // thanks Christopher Hawks
         while ((i < bytes.length - 1) && (bytes[i] > 0)) {
-            ret += Character.toString((char) bytes[i]);
+            ret.append(Character.toString((char) bytes[i]));
             i++;
         }
 
-        ret += Character.toString((char) (bytes[i] + 128));
+        ret.append(Character.toString((char) (bytes[i] + 128)));
 
-        return (ret);
+        return (ret.toString());
     }
 
     public static String prettyFormat(int diskFormat) {
@@ -853,31 +868,32 @@ public class DWUtils {
 
         ThreadGroup tg = Thread.currentThread().getThreadGroup();
         ThreadGroup ptg;
-        while ((ptg = tg.getParent()) != null)
+        while ((ptg = tg.getParent()) != null) {
             tg = ptg;
+        }
         return tg;
     }
 
     public static String OS9String(byte[] buf) {
-        String res = "";
+        StringBuilder res = new StringBuilder();
 
         int pos = 0;
 
         while ((pos < buf.length) && ((buf[pos] & 0xFF) < 128)) {
-            res += (char) (buf[pos] & 0xff);
+            res.append((char) (buf[pos] & 0xff));
             pos++;
         }
 
-        if (pos < buf.length)
-            res += (char) ((buf[pos] & 0xff) - 128);
+        if (pos < buf.length) {
+            res.append((char) ((buf[pos] & 0xff) - 128));
+        }
 
-        return res;
+        return res.toString();
     }
 
     public static String pretty5ByteDateTime(byte[] data) {
-        String res = String.format("%02d:%02d %02d/%02d/%04d", (data[3] & 0xff), (data[4] & 0xff), (data[1] & 0xff), (data[2] & 0xff), (1900 + (data[0] & 0xff)));
 
-        return res;
+        return String.format("%02d:%02d %02d/%02d/%04d", (data[3] & 0xff), (data[4] & 0xff), (data[1] & 0xff), (data[2] & 0xff), (1900 + (data[0] & 0xff)));
     }
 
 

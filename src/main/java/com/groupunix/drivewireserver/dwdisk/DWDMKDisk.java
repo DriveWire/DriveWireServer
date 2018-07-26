@@ -19,11 +19,11 @@ public class DWDMKDisk extends DWDisk
 {
 	private static final Logger logger = Logger.getLogger("DWServer.DWDMKDisk");
 	
-	private ArrayList<DWDMKDiskTrack> tracks = new ArrayList<DWDMKDiskTrack>();
+	private final ArrayList<DWDMKDiskTrack> tracks = new ArrayList<>();
 	private DWDMKDiskHeader header;
 	
 	
-	public DWDMKDisk(FileObject fileobj) throws IOException, DWImageFormatException
+	DWDMKDisk(FileObject fileobj) throws IOException, DWImageFormatException
 	{
 		super(fileobj);
 		this.setParam("_format", "dmk");
@@ -164,8 +164,7 @@ public class DWDMKDisk extends DWDisk
 	
 	
 	
-	private void addSectorFrom(DWDMKDiskIDAM idam, int track) throws DWImageFormatException, FileSystemException
-	{
+	private void addSectorFrom(DWDMKDiskIDAM idam, int track) throws DWImageFormatException {
 		int lsn = calcLSN(idam);
 		
 		if ((lsn > -1) && (lsn < this.sectors.size()))
@@ -205,14 +204,7 @@ public class DWDMKDisk extends DWDisk
 			
 			if (!this.header.isSingleDensity())
 			{
-				if ((0xFF & this.tracks.get(track).getData()[loc]) == 0xA1)
-				{
-					sync = true;
-				}
-				else
-				{
-					sync = false;
-				}
+				sync = (0xFF & this.tracks.get(track).getData()[loc]) == 0xA1;
 			}
 			
 			loc++;
@@ -268,8 +260,7 @@ public class DWDMKDisk extends DWDisk
 
 
 	
-	public void writeSector(byte[] data, boolean update) throws DWDriveWriteProtectedException,	IOException
-	{
+	public void writeSector(byte[] data, boolean update) throws DWDriveWriteProtectedException {
 		if (this.getWriteProtect())
 		{
 			throw new DWDriveWriteProtectedException("Disk is write protected");
@@ -298,7 +289,7 @@ public class DWDMKDisk extends DWDisk
 
 
 
-	public static int considerImage(byte[] hdr, long fobjsize)
+	static int considerImage(byte[] hdr, long fobjsize)
 	{
 		    
 		// is it big enough to have a header

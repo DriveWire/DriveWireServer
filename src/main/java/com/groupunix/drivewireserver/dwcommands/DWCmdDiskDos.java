@@ -5,59 +5,48 @@ import com.groupunix.drivewireserver.dwprotocolhandler.DWProtocolHandler;
 
 public class DWCmdDiskDos extends DWCommand {
 
-	static final String command = "dos";
-	private DWCommandList commands;
-	private DWProtocolHandler dwProto;	
-	
-	public DWCmdDiskDos(DWProtocolHandler dwProto,DWCommand parent)
-	{
-		setParentCmd(parent);
-		this.dwProto = dwProto;
-		
-		commands = new DWCommandList(this.dwProto, this.dwProto.getCMDCols());
-		
-		commands.addcommand(new DWCmdDiskDosDir(dwProto,this));
-		commands.addcommand(new DWCmdDiskDosList(dwProto,this));
-		commands.addcommand(new DWCmdDiskDosFormat(dwProto,this));
-		commands.addcommand(new DWCmdDiskDosAdd(dwProto,this));
-	}
+    static final String command = "dos";
+    private final DWCommandList commands;
 
-	
-	public String getCommand() 
-	{
-		return command;
-	}
+    DWCmdDiskDos(DWProtocolHandler dwProto, DWCommand parent) {
+        setParentCmd(parent);
 
-	public DWCommandResponse parse(String cmdline)
-	{
-		if (cmdline.length() == 0)
-		{
-			return(new DWCommandResponse(this.commands.getShortHelp()));
-		}
-		return(commands.parse(cmdline));
-	}
+        commands = new DWCommandList(dwProto, dwProto.getCMDCols());
 
-	public DWCommandList getCommandList()
-	{
-		return(this.commands);
-	}
+        commands.addcommand(new DWCmdDiskDosDir(dwProto, this));
+        commands.addcommand(new DWCmdDiskDosList(dwProto, this));
+        commands.addcommand(new DWCmdDiskDosFormat(dwProto, this));
+        commands.addcommand(new DWCmdDiskDosAdd(dwProto, this));
+    }
 
 
+    public String getCommand() {
+        return command;
+    }
 
-	public String getShortHelp() 
-	{
-		return "Manage DOS disks";
-	}
+    public DWCommandResponse parse(String cmdline) {
+        if (cmdline.length() == 0) {
+            return (new DWCommandResponse(this.commands.getShortHelp()));
+        }
+        return (commands.parse(cmdline));
+    }
+
+    public DWCommandList getCommandList() {
+        return (this.commands);
+    }
 
 
-	public String getUsage() 
-	{
-		return "dw disk dos [command]";
-	}
-	
-	public boolean validate(String cmdline) 
-	{
-		return(commands.validate(cmdline));
-	}
-	
+    public String getShortHelp() {
+        return "Manage DOS disks";
+    }
+
+
+    public String getUsage() {
+        return "dw disk dos [command]";
+    }
+
+    public boolean validate(String cmdline) {
+        return (commands.validate(cmdline));
+    }
+
 }

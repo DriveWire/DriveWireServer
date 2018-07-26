@@ -10,90 +10,79 @@ import com.groupunix.drivewireserver.dwprotocolhandler.DWUtils;
 
 public class UICmdInstanceTimerShow extends DWCommand {
 
-	private DWProtocol dwProto = null;
-	private DWUIClientThread uiref;
-	
+    private DWProtocol dwProto = null;
+    private DWUIClientThread uiref;
 
-	public UICmdInstanceTimerShow(DWProtocol dwProtocol) 
-	{
-		this.dwProto = dwProtocol;
-	}
 
-	public UICmdInstanceTimerShow(DWUIClientThread dwuiClientThread)
-	{
-		this.uiref = dwuiClientThread;
-	}
+    public UICmdInstanceTimerShow(DWProtocol dwProtocol) {
+        this.dwProto = dwProtocol;
+    }
 
-	@Override
-	public String getCommand() 
-	{
-		return "show";
-	}
+    public UICmdInstanceTimerShow(DWUIClientThread dwuiClientThread) {
+        this.uiref = dwuiClientThread;
+    }
 
-	@Override
-	public String getShortHelp() {
-		return "show instance timer(s)";
-	}
+    @Override
+    public String getCommand() {
+        return "show";
+    }
 
-	@Override
-	public String getUsage() {
-		return "ui instance timer show {#}";
-	}
+    @Override
+    public String getShortHelp() {
+        return "show instance timer(s)";
+    }
 
-	@Override
-	public DWCommandResponse parse(String cmdline) 
-	{
+    @Override
+    public String getUsage() {
+        return "ui instance timer show {#}";
+    }
 
-		if (this.dwProto == null)
-		{
-			if (DriveWireServer.isValidHandlerNo(this.uiref.getInstance()))
-				dwProto = DriveWireServer.getHandler(this.uiref.getInstance());
-			else
-				return(new DWCommandResponse(false,DWDefs.RC_INSTANCE_WONT ,"The operation is not supported by this instance"));
-		}
-		
-		if (cmdline.length() == 0)
-		{
-			String txt = "";
-			
-			for (int i = 0;i < 256;i++)
-			{
-				if (dwProto.getTimers().getTimer((byte) i) > 0 )
-				{
-					txt += getTimerData((byte) i) + "\r\n";
-				}
-			}
-			
-			return(new DWCommandResponse(txt));
-		}	
-		else
-		{
-			String[] args = cmdline.split(" ");
-			
-			try
-			{
-				byte tno = (byte) Integer.parseInt(args[0]);
-				
-				return(new DWCommandResponse(getTimerData(tno)));
-			}
-			catch (NumberFormatException e)
-			{
-				return(new DWCommandResponse(false,DWDefs.RC_SYNTAX_ERROR , "Timer # must be 0-255"));
-			}
-			
-			
-		}
-		
-	
-	}
+    @Override
+    public DWCommandResponse parse(String cmdline) {
 
-	private String getTimerData(byte tno)
-	{
-		return( (tno & 0xff) + "|" + DWUtils.prettyTimer(tno) +"|" + dwProto.getTimers().getTimer(tno));
-	}
+        if (this.dwProto == null) {
+            if (DriveWireServer.isValidHandlerNo(this.uiref.getInstance())) {
+                dwProto = DriveWireServer.getHandler(this.uiref.getInstance());
+            }
+            else {
+                return (new DWCommandResponse(false, DWDefs.RC_INSTANCE_WONT, "The operation is not supported by this instance"));
+            }
+        }
 
-	public boolean validate(String cmdline) 
-	{
-		return(true);
-	}
+        if (cmdline.length() == 0) {
+            StringBuilder txt = new StringBuilder();
+
+            for (int i = 0; i < 256; i++) {
+                if (dwProto.getTimers().getTimer((byte) i) > 0) {
+                    txt.append(getTimerData((byte) i)).append("\r\n");
+                }
+            }
+
+            return (new DWCommandResponse(txt.toString()));
+        }
+        else {
+            String[] args = cmdline.split(" ");
+
+            try {
+                byte tno = (byte) Integer.parseInt(args[0]);
+
+                return (new DWCommandResponse(getTimerData(tno)));
+            }
+            catch (NumberFormatException e) {
+                return (new DWCommandResponse(false, DWDefs.RC_SYNTAX_ERROR, "Timer # must be 0-255"));
+            }
+
+
+        }
+
+
+    }
+
+    private String getTimerData(byte tno) {
+        return ((tno & 0xff) + "|" + DWUtils.prettyTimer(tno) + "|" + dwProto.getTimers().getTimer(tno));
+    }
+
+    public boolean validate(String cmdline) {
+        return (true);
+    }
 }

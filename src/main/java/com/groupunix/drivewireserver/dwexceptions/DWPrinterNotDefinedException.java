@@ -1,12 +1,10 @@
 package com.groupunix.drivewireserver.dwexceptions;
 
-public class DWPrinterNotDefinedException extends Exception 
-{
+public class DWPrinterNotDefinedException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public DWPrinterNotDefinedException(String msg)
-	{
-		super(msg);
-	}
+    public DWPrinterNotDefinedException(String msg) {
+        super(msg);
+    }
 }

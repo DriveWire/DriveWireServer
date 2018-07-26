@@ -7,53 +7,40 @@ import com.groupunix.drivewireserver.dwprotocolhandler.DWProtocolHandler;
 
 public class UICmdInstanceDiskDos extends DWCommand {
 
-	static final String command = "dos";
-	
-		
-	public UICmdInstanceDiskDos(DWUIClientThread dwuiClientThread)
-	{
-
-		commands.addcommand(new UICmdInstanceDiskDosDir(dwuiClientThread));
-		// commands.addcommand(new UICmdInstanceDiskSerial(dwuiClientThread));
-		// commands.addcommand(new UICmdInstanceDiskStatus(dwuiClientThread));
-	}
-
-	
-	public UICmdInstanceDiskDos(DWProtocolHandler dwProto) 
-	{
-		commands.addcommand(new UICmdInstanceDiskDosDir(dwProto));
-		// commands.addcommand(new UICmdInstanceDiskSerial(dwProto));
-		// commands.addcommand(new UICmdInstanceDiskStatus(dwProto));
-	
-	}
+    static final String command = "dos";
 
 
-	public String getCommand() 
-	{
-		return command;
-	}
+    public UICmdInstanceDiskDos(DWUIClientThread dwuiClientThread) {
 
-	public DWCommandResponse parse(String cmdline)
-	{
-		return(commands.parse(cmdline));
-	}
+        commands.addcommand(new UICmdInstanceDiskDosDir(dwuiClientThread));
+    }
 
 
-
-	public String getShortHelp() 
-	{
-		return "Instance DOS format disk commands";
-	}
+    public UICmdInstanceDiskDos(DWProtocolHandler dwProto) {
+        commands.addcommand(new UICmdInstanceDiskDosDir(dwProto));
+    }
 
 
-	public String getUsage() 
-	{
-		return "ui instance disk dos [command]";
-	}
-	
-	public boolean validate(String cmdline) 
-	{
-		return(commands.validate(cmdline));
-	}
-	
+    public String getCommand() {
+        return command;
+    }
+
+    public DWCommandResponse parse(String cmdline) {
+        return (commands.parse(cmdline));
+    }
+
+
+    public String getShortHelp() {
+        return "Instance DOS format disk commands";
+    }
+
+
+    public String getUsage() {
+        return "ui instance disk dos [command]";
+    }
+
+    public boolean validate(String cmdline) {
+        return (commands.validate(cmdline));
+    }
+
 }

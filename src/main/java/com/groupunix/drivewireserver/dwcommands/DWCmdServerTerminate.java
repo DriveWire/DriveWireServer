@@ -4,45 +4,40 @@ import com.groupunix.drivewireserver.DriveWireServer;
 
 public class DWCmdServerTerminate extends DWCommand {
 
-	
-	public DWCmdServerTerminate(DWCommand parent)
-	{
-		setParentCmd(parent);
-	}
-	
-	
-	public String getCommand() 
-	{
-		return "terminate";
-	}
+
+    DWCmdServerTerminate(DWCommand parent) {
+        setParentCmd(parent);
+    }
 
 
-	public String getShortHelp() 
-	{
-		return "Shut down server";
-	}
+    public String getCommand() {
+        return "terminate";
+    }
 
 
-	public String getUsage() 
-	{
-		return "dw server terminate [force]";
-	}
-
-	public DWCommandResponse parse(String cmdline) 
-	{
-		if (cmdline.equals("force"))
-			System.exit(1);
-		
-		DriveWireServer.shutdown();
-		
-		return(new DWCommandResponse("Server shutdown requested."));
-	}
+    public String getShortHelp() {
+        return "Shut down server";
+    }
 
 
+    public String getUsage() {
+        return "dw server terminate [force]";
+    }
 
-	public boolean validate(String cmdline) {
-		return true;
-	}
-	
-	
+    public DWCommandResponse parse(String cmdline) {
+        if (cmdline.equals("force")) {
+            System.exit(1);
+        }
+
+        DriveWireServer.shutdown();
+
+        return (new DWCommandResponse("Server shutdown requested."));
+    }
+
+
+    public boolean validate(String cmdline) {
+        return true;
+    }
+
+
 }

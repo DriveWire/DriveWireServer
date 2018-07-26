@@ -1,18 +1,16 @@
 package com.groupunix.drivewireserver.dwdisk.filesystem;
 
+import com.groupunix.drivewireserver.DECBDefs;
+import com.groupunix.drivewireserver.dwdisk.DWDiskSector;
+import com.groupunix.drivewireserver.dwexceptions.DWFileSystemFullException;
+import com.groupunix.drivewireserver.dwexceptions.DWFileSystemInvalidFATException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import com.groupunix.drivewireserver.DECBDefs;
-import com.groupunix.drivewireserver.dwdisk.DWDiskSector;
-
-import com.groupunix.drivewireserver.dwexceptions.DWFileSystemFullException;
-import com.groupunix.drivewireserver.dwexceptions.DWFileSystemInvalidFATException;
-
-public class DWDECBFileSystemFAT
-{
+public class DWDECBFileSystemFAT {
 	/*
 	FILE ALLOCATION TABLE
 
@@ -60,180 +58,140 @@ public class DWDECBFileSystemFAT
 	will still  require a  full granule to be   allocated  in order to store the file.
 */
 
-	
-	
-	private DWDiskSector sector;
-	
-	public DWDECBFileSystemFAT(DWDiskSector sector)
-	{
-		this.sector = sector;
-	}
 
-	public ArrayList<DWDiskSector> getFileSectors(Vector<DWDiskSector> sectors, byte granule) throws DWFileSystemInvalidFATException, IOException
-	{
-		ArrayList<DWDiskSector> res = new ArrayList<DWDiskSector>();
-		
-		byte entry = getEntry(granule);
-		
-		while (!this.isLastEntry(entry))
-		{
-			res.addAll(this.getGranuleSectors(sectors, granule));
-			
-			granule = entry;
-			entry = getEntry(granule);
-		}
-		
-		// last granule is partial, first 4 bits say how many sectors to read
-		for (int i = 0;i < (entry & 0x0F);i++ )
-		{
-			res.add(sectors.get(getFirstSectorNoForGranule(granule)+i));
-		}
-		
-		
-		return(res);
-	}
-	
-	
-	public ArrayList<Byte> getFileGranules(byte granule) throws DWFileSystemInvalidFATException, IOException
-	{
-		ArrayList<Byte> res = new ArrayList<Byte>();
-		
-		while (!this.isLastEntry(granule))
-		{
-			res.add(granule);
-			granule = getEntry(granule);
-		}
-		
-		return(res);
-	}
-	
-	
-	
-	private List<DWDiskSector> getGranuleSectors(Vector<DWDiskSector> sectors, byte granule)
-	{
-		List<DWDiskSector> res = new ArrayList<DWDiskSector>();
-		
-		for (int i = 0;i<9;i++)
-		{
-			res.add(sectors.get(this.getFirstSectorNoForGranule(granule) + i));
-		}
-		
-		return res;
-	}
+    private final DWDiskSector sector;
 
-	
-	private int getFirstSectorNoForGranule(byte granule)
-	{
-		if ((granule & 0xFF) < 34)
-			return (granule * 9);
-		else
-			// skip track 17 like this?
-			return((granule + 2) * 9);
-		
-	}
+    DWDECBFileSystemFAT(DWDiskSector sector) {
+        this.sector = sector;
+    }
 
-	public byte getEntry(byte granule) throws DWFileSystemInvalidFATException, IOException
-	{
-	
-		if (((granule & 0xFF) ) <= DECBDefs.FAT_SIZE)
-			if ((this.sector.getData()[(granule & 0xFF) ] & 0xFF) == 0xFF)
-				throw (new DWFileSystemInvalidFATException("Chain links to unused FAT entry #" + granule));
-			else
-				return(this.sector.getData()[(granule & 0xFF)]);
-		else
-			throw (new DWFileSystemInvalidFATException("Invalid granule #" + granule));
-	}
-	
-	public byte getGranuleByte(byte granule) throws IOException
-	{
-		return this.sector.getData()[(granule & 0xFF)];
-	}
-	
-	public boolean isLastEntry(byte entry)
-	{
-		if ((entry & 0xC0) == 0xC0)
-			return true;
-		
-		return false;
-		
-	}
+    public ArrayList<DWDiskSector> getFileSectors(Vector<DWDiskSector> sectors, byte granule) throws DWFileSystemInvalidFATException, IOException {
+        ArrayList<DWDiskSector> res = new ArrayList<>();
 
-	public int getFreeGanules() throws IOException
-	{
-		int free =0;
-		
-		for (int i = 0;i< (DECBDefs.FAT_SIZE);i++)
-			if ((this.sector.getData()[i] & 0xFF) == 0xFF)
-				free++;
-		
-		return free;
-	}
+        byte entry = getEntry(granule);
 
-	public byte allocate(int bytes) throws DWFileSystemFullException, IOException
-	{
-		int allocated = 0;
-	
-		int sectorsneeded = (bytes / 256) + 1;
+        while (!this.isLastEntry(entry)) {
+            res.addAll(this.getGranuleSectors(sectors, granule));
 
-		int granulesneeded = sectorsneeded / 9;
-		
-		if (!(sectorsneeded % 9 == 0))
-			granulesneeded++;
-		
-		// check for free space
-		
-		if (this.getFreeGanules() < granulesneeded)
-			throw (new DWFileSystemFullException("Need " + granulesneeded + " granules, have only " + this.getFreeGanules() + " free."));
-		
-		
-		byte lastgran = this.getFreeGranule();
-		byte firstgran = lastgran;
-		allocated++;
-		
-		while (allocated < granulesneeded)
-		{
-			this.setEntry(lastgran, (byte) 0xc0);
-			byte nextgran = this.getFreeGranule();
-			this.setEntry(lastgran, nextgran);
-			
-			lastgran = nextgran;
-			allocated++;
-		}
-		
-		this.setEntry(lastgran, (byte) ((sectorsneeded % 9) + 0xC0));
-		
-		return firstgran;
-	}
+            granule = entry;
+            entry = getEntry(granule);
+        }
 
-	
-	private void setEntry(byte gran, byte nextgran) throws IOException
-	{
-		this.sector.setDataByte((0xFF & gran), nextgran);
-		this.sector.makeDirty();
-	}
+        // last granule is partial, first 4 bits say how many sectors to read
+        for (int i = 0; i < (entry & 0x0F); i++) {
+            res.add(sectors.get(getFirstSectorNoForGranule(granule) + i));
+        }
 
-	private byte getFreeGranule() throws IOException
-	{
-		for (byte i = 0;i< (DECBDefs.FAT_SIZE);i++)
-		{
-			if ((this.sector.getData()[i] & 0xFF) == 0xFF)
-				return(i);
-		}
-		return -1;
-	}
 
-	public String dumpFat() throws IOException
-	{
-		String res = "";
-			
-		for (int i = 0; i< DECBDefs.FAT_SIZE; i++)
-			if (this.sector.getData()[i] != -1)
-				res += i + ": " + this.sector.getData()[i] + "\t\t";
-		
-		return(res);
-			
-	}
-	
-	
-	
+        return (res);
+    }
+
+
+    private List<DWDiskSector> getGranuleSectors(Vector<DWDiskSector> sectors, byte granule) {
+        List<DWDiskSector> res = new ArrayList<>();
+
+        for (int i = 0; i < 9; i++) {
+            res.add(sectors.get(this.getFirstSectorNoForGranule(granule) + i));
+        }
+
+        return res;
+    }
+
+
+    private int getFirstSectorNoForGranule(byte granule) {
+        if ((granule & 0xFF) < 34) {
+            return (granule * 9);
+        }
+        else
+        // skip track 17 like this?
+        {
+            return ((granule + 2) * 9);
+        }
+
+    }
+
+    public byte getEntry(byte granule) throws DWFileSystemInvalidFATException, IOException {
+
+        if (((granule & 0xFF)) <= DECBDefs.FAT_SIZE) {
+            if ((this.sector.getData()[(granule & 0xFF)] & 0xFF) == 0xFF) {
+                throw (new DWFileSystemInvalidFATException("Chain links to unused FAT entry #" + granule));
+            }
+            else {
+                return (this.sector.getData()[(granule & 0xFF)]);
+            }
+        }
+        else {
+            throw (new DWFileSystemInvalidFATException("Invalid granule #" + granule));
+        }
+    }
+
+    public boolean isLastEntry(byte entry) {
+        return (entry & 0xC0) == 0xC0;
+
+    }
+
+    public int getFreeGanules() throws IOException {
+        int free = 0;
+
+        for (int i = 0; i < (DECBDefs.FAT_SIZE); i++) {
+            if ((this.sector.getData()[i] & 0xFF) == 0xFF) {
+                free++;
+            }
+        }
+
+        return free;
+    }
+
+    public byte allocate(int bytes) throws DWFileSystemFullException, IOException {
+        int allocated = 0;
+
+        int sectorsneeded = (bytes / 256) + 1;
+
+        int granulesneeded = sectorsneeded / 9;
+
+        if (!(sectorsneeded % 9 == 0)) {
+            granulesneeded++;
+        }
+
+        // check for free space
+
+        if (this.getFreeGanules() < granulesneeded) {
+            throw (new DWFileSystemFullException("Need " + granulesneeded + " granules, have only " + this.getFreeGanules() + " free."));
+        }
+
+
+        byte lastgran = this.getFreeGranule();
+        byte firstgran = lastgran;
+        allocated++;
+
+        while (allocated < granulesneeded) {
+            this.setEntry(lastgran, (byte) 0xc0);
+            byte nextgran = this.getFreeGranule();
+            this.setEntry(lastgran, nextgran);
+
+            lastgran = nextgran;
+            allocated++;
+        }
+
+        this.setEntry(lastgran, (byte) ((sectorsneeded % 9) + 0xC0));
+
+        return firstgran;
+    }
+
+
+    private void setEntry(byte gran, byte nextgran) throws IOException {
+        this.sector.setDataByte((0xFF & gran), nextgran);
+        this.sector.makeDirty();
+    }
+
+    private byte getFreeGranule() throws IOException {
+        for (byte i = 0; i < (DECBDefs.FAT_SIZE); i++) {
+            if ((this.sector.getData()[i] & 0xFF) == 0xFF) {
+                return (i);
+            }
+        }
+        return -1;
+    }
+
+
 }

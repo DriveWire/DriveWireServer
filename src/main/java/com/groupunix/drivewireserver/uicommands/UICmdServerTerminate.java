@@ -8,53 +8,38 @@ import com.groupunix.drivewireserver.dwprotocolhandler.DWProtocol;
 
 public class UICmdServerTerminate extends DWCommand {
 
-	static final String command = "terminate";
+    static final String command = "terminate";
 
-	@SuppressWarnings("unused")
-	private DWUIClientThread dwuiref;
-
-	@SuppressWarnings("unused")
-	private DWProtocol dwProto;
-		
-	public UICmdServerTerminate(DWUIClientThread dwuiClientThread)
-	{
-		this.dwuiref = dwuiClientThread;
-	}
-
-	
-	public UICmdServerTerminate(DWProtocol dwProto) 
-	{
-		this.dwProto = dwProto;
-	}
+    public UICmdServerTerminate(DWUIClientThread dwuiClientThread) {
+    }
 
 
-	public String getCommand() 
-	{
-		return command;
-	}
-
-	public DWCommandResponse parse(String cmdline)
-	{
-		DriveWireServer.shutdown();
-		return(new DWCommandResponse("Server shutdown requested."));
-	}
+    public UICmdServerTerminate(DWProtocol dwProto) {
+        DWProtocol dwProto1 = dwProto;
+    }
 
 
+    public String getCommand() {
+        return command;
+    }
 
-	public String getShortHelp() 
-	{
-		return "Terminate the server";
-	}
+    public DWCommandResponse parse(String cmdline) {
+        DriveWireServer.shutdown();
+        return (new DWCommandResponse("Server shutdown requested."));
+    }
 
 
-	public String getUsage() 
-	{
-		return "ui server terminate";
-	}
-	
-	public boolean validate(String cmdline) 
-	{
-		return(true);
-	}
-	
+    public String getShortHelp() {
+        return "Terminate the server";
+    }
+
+
+    public String getUsage() {
+        return "ui server terminate";
+    }
+
+    public boolean validate(String cmdline) {
+        return (true);
+    }
+
 }

@@ -1,20 +1,14 @@
 package com.groupunix.drivewireserver.dwprotocolhandler;
 
+import com.groupunix.drivewireserver.OS9Defs;
+import org.apache.commons.vfs2.*;
+import org.apache.log4j.Logger;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.VFS;
-import org.apache.log4j.Logger;
-
-import com.groupunix.drivewireserver.OS9Defs;
-
-public class DWRFMFD
-{
+public class DWRFMFD {
 
 	/*
 	 * ************************
@@ -42,319 +36,229 @@ FD.LS2         EQU       (256/FDSL.S-1)*FDSL.S
 MINSEC         SET       16
 	 */
 
-	
-	
-	private byte ATT;
-	private byte[] OWN;
-	private byte[] DAT;
-	private byte LNK;
-	private byte[] SIZ;
-	private byte[] Creat;
 
-	private String pathstr;
-	
-	private FileSystemManager fsManager;
-	private FileObject fileobj;
-	
-	private static final Logger logger = Logger.getLogger("DWServer.DWRFMFD");
-	
-	
-	public DWRFMFD(String pathstr) throws FileSystemException
-	{
-		this.pathstr = pathstr;
-		
-		this.fsManager = VFS.getManager();
-		this.fileobj = this.fsManager.resolveFile(pathstr);
+    private byte ATT;
+    private byte[] OWN;
+    private byte[] DAT;
+    private byte LNK;
+    private byte[] SIZ;
+    private byte[] Creat;
 
-		logger.info("New FD for '" + pathstr + "'");
-		
-	}
+    private final String pathstr;
+
+    private FileObject fileobj;
+
+    private static final Logger logger = Logger.getLogger("DWServer.DWRFMFD");
 
 
-	public byte[] getFD()
-	{
-		byte[] b = new byte[256];
-		
-		for (int i = 0;i<256;i++)
-		{
-			b[i] = 0;
-		}
-		
-		b[0] = getATT();
-		System.arraycopy(getOWN(), 0, b, 1, 2);
-		System.arraycopy(getDAT(), 0, b, 3, 5);
-		b[8] = getLNK();
-		System.arraycopy(getSIZ(), 0, b, 9, 4);
-		System.arraycopy(getCreat(), 0, b, 13, 3);
-				
-		return(b);
-		
-	}
-	
-	public void setFD(byte[] fd)
-	{
-		byte[] b = new byte[5];
-		
-		setATT(fd[0]);
-		
-		System.arraycopy(fd, 1, b, 0, 2);
-		setOWN(b);
-		
-		System.arraycopy(fd, 3, b, 0, 5);
-		setDAT(b);
-		
-		setLNK(fd[8]);
-		
-		System.arraycopy(fd, 9, b, 0, 4);
-		setSIZ(b);
-		
-		System.arraycopy(fd, 13, b, 0, 3);
-		setCreat(b);
-		
-	}
+    public DWRFMFD(String pathstr) throws FileSystemException {
+        this.pathstr = pathstr;
 
-	
-	public void writeFD()
-	{
-		
-		
-	/*	if (this.fileobj.exists())
-		{
-			if (this.fileobj.isWriteable())
-			{
-				// we only write attributes + mod time
-			
-			
-				// for now.. user = public.. if either is set, we set on file 
-			
-				if ( ((getATT() & OS9Defs.MODE_R) == OS9Defs.MODE_R) || ((getATT() & OS9Defs.MODE_PR) == OS9Defs.MODE_PR))
-				{
-					fileobj.getContent().setAttribute(arg0, arg1)
-				}
-				f.setReadable(true);
-			}
-			else
-			{
-				f.setReadable(false);
-			}
-			
-			if ( ((getATT() & OS9Defs.MODE_W) == OS9Defs.MODE_W) || ((getATT() & OS9Defs.MODE_PW) == OS9Defs.MODE_PW))
-			{
-				f.setWritable(true);
-			}
-			else
-			{
-				f.setWritable(false);
-			}
-			
-			if ( ((getATT() & OS9Defs.MODE_E) == OS9Defs.MODE_E) || ((getATT() & OS9Defs.MODE_PE) == OS9Defs.MODE_PE))
-			{
-				f.setExecutable(true);
-			}
-			else
-			{
-				f.setExecutable(false);
-			}
-			
-			
-			// date and time modified
-			
-			f.setLastModified(bytesToTime(getDAT()));
-			
-		}
-		else
-		{
-			logger.error("attempt to write FD for non existent file '" + this.pathstr + "'");
-		}
-		*/
-	}
-	
+        FileSystemManager fsManager = VFS.getManager();
+        this.fileobj = fsManager.resolveFile(pathstr);
+
+        logger.info("New FD for '" + pathstr + "'");
+
+    }
 
 
-	public void readFD() throws FileSystemException
-	{
-		setOWN( new byte[] {0,0} );
-		setLNK((byte)1);
-		
-		if (this.fileobj.exists())
-		{
-			// attributes
-			
-			byte tmpmode = 0;
-			
-			// for now.. user = public 
-			
-			if (fileobj.isReadable())
-				tmpmode += OS9Defs.MODE_R + OS9Defs.MODE_PR;
-			
-			if (fileobj.isWriteable())
-				tmpmode += OS9Defs.MODE_W + OS9Defs.MODE_PW;
-			
-			// everything is executable for now
-				tmpmode += OS9Defs.MODE_E + OS9Defs.MODE_PE;
-			
-			if (fileobj.getType() == FileType.FOLDER)
-				tmpmode += OS9Defs.MODE_DIR;
-			
-			
-			setATT(tmpmode);
-						
-			// date and time modified
-			
-			setDAT(timeToBytes(fileobj.getContent().getLastModifiedTime()));
-			
-			// size
-			setSIZ(lengthToBytes(fileobj.getContent().getSize()));
-			
-			
-			
-			// date created (java doesn't know)
-			setCreat(new byte[] {0,0,0});
-		}
-		else
-		{
-			logger.error("attempt to read FD for non existant file '" + this.pathstr + "'");
-		}
-		
-	}
+    public byte[] getFD() {
+        byte[] b = new byte[256];
 
-	
-	
-	private byte[] lengthToBytes(long length)
-	{
-		double maxlen = Math.pow( 256, 4) / 2;
-		
-		if (length > maxlen)
-		{
-			logger.error("File too big: " + length + " bytes in '" + this.pathstr + "' (max " + maxlen + ")" );
-			return(new byte[] {0,0,0,0});
-		}
-		
-		byte [] b = new byte[4];  
-		for(int i= 0; i < 4; i++)
-		{  
-		    b[3 - i] = (byte)(length >>> (i * 8));  
-		}  
-		
-		return(b);
-	}
+        for (int i = 0; i < 256; i++) {
+            b[i] = 0;
+        }
+
+        b[0] = getATT();
+        System.arraycopy(getOWN(), 0, b, 1, 2);
+        System.arraycopy(getDAT(), 0, b, 3, 5);
+        b[8] = getLNK();
+        System.arraycopy(getSIZ(), 0, b, 9, 4);
+        System.arraycopy(getCreat(), 0, b, 13, 3);
+
+        return (b);
+
+    }
+
+    public void setFD(byte[] fd) {
+        byte[] b = new byte[5];
+
+        setATT(fd[0]);
+
+        System.arraycopy(fd, 1, b, 0, 2);
+        setOWN(b);
+
+        System.arraycopy(fd, 3, b, 0, 5);
+        setDAT(b);
+
+        setLNK(fd[8]);
+
+        System.arraycopy(fd, 9, b, 0, 4);
+        setSIZ(b);
+
+        System.arraycopy(fd, 13, b, 0, 3);
+        setCreat(b);
+
+    }
 
 
+    public void writeFD() {
 
-	private byte[] timeToBytes(long time)
-	{
-		GregorianCalendar c = new GregorianCalendar();
-		
-		c.setTime(new Date(time));
-		
-		byte[] b = new byte[5];
-		
-		b[0] = (byte)(c.get(Calendar.YEAR)-108);
-		b[1] = (byte)(c.get(Calendar.MONTH)+1);
-		b[2] = (byte)(c.get(Calendar.DAY_OF_MONTH));
-		b[3] = (byte)(c.get(Calendar.HOUR_OF_DAY));
-		b[4] = (byte)(c.get(Calendar.MINUTE));
-		
-		return(b);
-	}
-
-	@SuppressWarnings("unused")
-	private long bytesToTime(byte[] b)
-	{
-
-		GregorianCalendar c = new GregorianCalendar();
-		
-		c.set(Calendar.YEAR, b[0] + 108);
-		c.set(Calendar.MONTH, b[1]-1);
-		c.set(Calendar.DAY_OF_MONTH, b[2]);
-		c.set(Calendar.HOUR_OF_DAY,b[3]);
-		c.set(Calendar.MINUTE,b[4]);
-		
-		return c.getTimeInMillis();
-	}
-
-	
-
-	public void setATT(byte aTT)
-	{
-		ATT = aTT;
-	}
+    }
 
 
+    public void readFD() throws FileSystemException {
+        setOWN(new byte[]{0, 0});
+        setLNK((byte) 1);
 
-	public byte getATT()
-	{
-		return ATT;
-	}
+        if (this.fileobj.exists()) {
+            // attributes
 
+            byte tmpmode = 0;
 
+            // for now.. user = public
 
-	public void setOWN(byte[] oWN)
-	{
-		OWN = oWN;
-	}
+            if (fileobj.isReadable()) {
+                tmpmode += OS9Defs.MODE_R + OS9Defs.MODE_PR;
+            }
 
+            if (fileobj.isWriteable()) {
+                tmpmode += OS9Defs.MODE_W + OS9Defs.MODE_PW;
+            }
 
+            // everything is executable for now
+            tmpmode += OS9Defs.MODE_E + OS9Defs.MODE_PE;
 
-	public byte[] getOWN()
-	{
-		return OWN;
-	}
-
-
-
-	public void setDAT(byte[] dAT)
-	{
-		DAT = dAT;
-	}
-
+            if (fileobj.getType() == FileType.FOLDER) {
+                tmpmode += OS9Defs.MODE_DIR;
+            }
 
 
-	public byte[] getDAT()
-	{
-		return DAT;
-	}
+            setATT(tmpmode);
+
+            // date and time modified
+
+            setDAT(timeToBytes(fileobj.getContent().getLastModifiedTime()));
+
+            // size
+            setSIZ(lengthToBytes(fileobj.getContent().getSize()));
 
 
+            // date created (java doesn't know)
+            setCreat(new byte[]{0, 0, 0});
+        }
+        else {
+            logger.error("attempt to read FD for non existant file '" + this.pathstr + "'");
+        }
 
-	public void setLNK(byte lNK)
-	{
-		LNK = lNK;
-	}
-
-
-
-	public byte getLNK()
-	{
-		return LNK;
-	}
+    }
 
 
+    private byte[] lengthToBytes(long length) {
+        double maxlen = Math.pow(256, 4) / 2;
 
-	public void setSIZ(byte[] sIZ)
-	{
-		SIZ = sIZ;
-	}
+        if (length > maxlen) {
+            logger.error("File too big: " + length + " bytes in '" + this.pathstr + "' (max " + maxlen + ")");
+            return (new byte[]{0, 0, 0, 0});
+        }
 
+        byte[] b = new byte[4];
+        for (int i = 0; i < 4; i++) {
+            b[3 - i] = (byte) (length >>> (i * 8));
+        }
 
-
-	public byte[] getSIZ()
-	{
-		return SIZ;
-	}
-
-
-
-	public void setCreat(byte[] creat)
-	{
-		Creat = creat;
-	}
+        return (b);
+    }
 
 
+    private byte[] timeToBytes(long time) {
+        GregorianCalendar c = new GregorianCalendar();
 
-	public byte[] getCreat()
-	{
-		return Creat;
-	}
+        c.setTime(new Date(time));
+
+        byte[] b = new byte[5];
+
+        b[0] = (byte) (c.get(Calendar.YEAR) - 108);
+        b[1] = (byte) (c.get(Calendar.MONTH) + 1);
+        b[2] = (byte) (c.get(Calendar.DAY_OF_MONTH));
+        b[3] = (byte) (c.get(Calendar.HOUR_OF_DAY));
+        b[4] = (byte) (c.get(Calendar.MINUTE));
+
+        return (b);
+    }
+
+    @SuppressWarnings("unused")
+    private long bytesToTime(byte[] b) {
+
+        GregorianCalendar c = new GregorianCalendar();
+
+        c.set(Calendar.YEAR, b[0] + 108);
+        c.set(Calendar.MONTH, b[1] - 1);
+        c.set(Calendar.DAY_OF_MONTH, b[2]);
+        c.set(Calendar.HOUR_OF_DAY, b[3]);
+        c.set(Calendar.MINUTE, b[4]);
+
+        return c.getTimeInMillis();
+    }
+
+
+    public void setATT(byte aTT) {
+        ATT = aTT;
+    }
+
+
+    public byte getATT() {
+        return ATT;
+    }
+
+
+    public void setOWN(byte[] oWN) {
+        OWN = oWN;
+    }
+
+
+    public byte[] getOWN() {
+        return OWN;
+    }
+
+
+    public void setDAT(byte[] dAT) {
+        DAT = dAT;
+    }
+
+
+    public byte[] getDAT() {
+        return DAT;
+    }
+
+
+    public void setLNK(byte lNK) {
+        LNK = lNK;
+    }
+
+
+    public byte getLNK() {
+        return LNK;
+    }
+
+
+    public void setSIZ(byte[] sIZ) {
+        SIZ = sIZ;
+    }
+
+
+    public byte[] getSIZ() {
+        return SIZ;
+    }
+
+
+    public void setCreat(byte[] creat) {
+        Creat = creat;
+    }
+
+
+    public byte[] getCreat() {
+        return Creat;
+    }
 
 }

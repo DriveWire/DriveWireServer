@@ -8,64 +8,54 @@ import com.groupunix.drivewireserver.dwprotocolhandler.DWProtocol;
 
 public class UICmdInstanceResetProtodev extends DWCommand {
 
-	static final String command = "protodev";
-	
-	private DWUIClientThread uiref = null;
+    static final String command = "protodev";
 
-	private DWProtocol dwProto = null;
+    private DWUIClientThread uiref = null;
 
-	public UICmdInstanceResetProtodev(DWUIClientThread dwuiClientThread) 
-	{
+    private DWProtocol dwProto = null;
 
-		this.uiref = dwuiClientThread;
-	}
+    public UICmdInstanceResetProtodev(DWUIClientThread dwuiClientThread) {
 
-	public UICmdInstanceResetProtodev(DWProtocol dwProto) 
-	{
-		this.dwProto = dwProto;
-	}
+        this.uiref = dwuiClientThread;
+    }
 
-	public String getCommand() 
-	{
-		return command;
-	}
+    public UICmdInstanceResetProtodev(DWProtocol dwProto) {
+        this.dwProto = dwProto;
+    }
 
-	public DWCommandResponse parse(String cmdline)
-	{
-		
-		String res = "Resetting protocol device in instance ";
-		
-		if (this.uiref != null)
-		{
-			res += this.uiref.getInstance();
-			DriveWireServer.getHandler(this.uiref.getInstance()).resetProtocolDevice();
-		}
-		else
-		{
-			res += this.dwProto.getHandlerNo();
-			dwProto.resetProtocolDevice();
-		}
-		
-		
-		return(new DWCommandResponse(res));
-	}
+    public String getCommand() {
+        return command;
+    }
+
+    public DWCommandResponse parse(String cmdline) {
+
+        String res = "Resetting protocol device in instance ";
+
+        if (this.uiref != null) {
+            res += this.uiref.getInstance();
+            DriveWireServer.getHandler(this.uiref.getInstance()).resetProtocolDevice();
+        }
+        else {
+            res += this.dwProto.getHandlerNo();
+            dwProto.resetProtocolDevice();
+        }
 
 
-
-	public String getShortHelp() 
-	{
-		return "Reset protocol device";
-	}
+        return (new DWCommandResponse(res));
+    }
 
 
-	public String getUsage() 
-	{
-		return "ui instance reset protodev";
-	}
-	
-	public boolean validate(String cmdline) 
-	{
-		return(true);
-	}
-	
+    public String getShortHelp() {
+        return "Reset protocol device";
+    }
+
+
+    public String getUsage() {
+        return "ui instance reset protodev";
+    }
+
+    public boolean validate(String cmdline) {
+        return (true);
+    }
+
 }

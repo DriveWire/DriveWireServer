@@ -7,49 +7,42 @@ import com.groupunix.drivewireserver.dwprotocolhandler.DWProtocol;
 
 public class UICmdInstanceReset extends DWCommand {
 
-	static final String command = "reset";
-	
-		
-	public UICmdInstanceReset(DWUIClientThread dwuiClientThread)
-	{
-
-		commands.addcommand(new UICmdInstanceResetProtodev(dwuiClientThread));
-
-	}
-
-	
-	public UICmdInstanceReset(DWProtocol dwProto) 
-	{
-		commands.addcommand(new UICmdInstanceResetProtodev(dwProto));
-
-	}
+    static final String command = "reset";
 
 
-	public String getCommand() 
-	{
-		return command;
-	}
+    public UICmdInstanceReset(DWUIClientThread dwuiClientThread) {
 
-	public DWCommandResponse parse(String cmdline)
-	{
-		return(commands.parse(cmdline));
-	}
+        commands.addcommand(new UICmdInstanceResetProtodev(dwuiClientThread));
+
+    }
 
 
-	public String getShortHelp() 
-	{
-		return "Restart commands";
-	}
+    public UICmdInstanceReset(DWProtocol dwProto) {
+        commands.addcommand(new UICmdInstanceResetProtodev(dwProto));
+
+    }
 
 
-	public String getUsage() 
-	{
-		return "ui instance reset [command]";
-	}
-	
-	public boolean validate(String cmdline) 
-	{
-		return(commands.validate(cmdline));
-	}
-	
+    public String getCommand() {
+        return command;
+    }
+
+    public DWCommandResponse parse(String cmdline) {
+        return (commands.parse(cmdline));
+    }
+
+
+    public String getShortHelp() {
+        return "Restart commands";
+    }
+
+
+    public String getUsage() {
+        return "ui instance reset [command]";
+    }
+
+    public boolean validate(String cmdline) {
+        return (commands.validate(cmdline));
+    }
+
 }

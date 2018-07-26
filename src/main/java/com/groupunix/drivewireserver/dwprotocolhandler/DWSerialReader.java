@@ -11,14 +11,14 @@ import java.io.InputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class DWSerialReader implements SerialPortDataListener {
-    static Logger logger = Logger.getLogger(com.groupunix.drivewireserver.dwprotocolhandler.DWSerialReader.class);
+    static final Logger logger = Logger.getLogger(com.groupunix.drivewireserver.dwprotocolhandler.DWSerialReader.class);
 
-    private ArrayBlockingQueue<Byte> queue;
-    private InputStream in;
-    private SerialPort serialPort;
+    private final ArrayBlockingQueue<Byte> queue;
+    private final InputStream in;
+    private final SerialPort serialPort;
     private boolean wanttodie = false;
 
-    public DWSerialReader(SerialPort serialPort, ArrayBlockingQueue<Byte> q) {
+    DWSerialReader(SerialPort serialPort, ArrayBlockingQueue<Byte> q) {
 
         this.queue = q;
         this.serialPort = serialPort;
@@ -37,7 +37,7 @@ public class DWSerialReader implements SerialPortDataListener {
         try {
             while (!wanttodie && this.serialPort.bytesAvailable() > 0) {
                 data = in.read();
-                if(data < 0) {
+                if (data < 0) {
                     logger.warn("Read error.");
                 }
                 else {

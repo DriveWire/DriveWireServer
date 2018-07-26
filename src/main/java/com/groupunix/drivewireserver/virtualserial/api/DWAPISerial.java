@@ -3,7 +3,6 @@ package com.groupunix.drivewireserver.virtualserial.api;
 import com.fazecast.jSerialComm.SerialPort;
 import com.groupunix.drivewireserver.DWDefs;
 import com.groupunix.drivewireserver.DriveWireServer;
-import com.groupunix.drivewireserver.exception.NoSuchPortException;
 import com.groupunix.drivewireserver.dwcommands.DWCommandResponse;
 import com.groupunix.drivewireserver.dwexceptions.DWPortNotValidException;
 import com.groupunix.drivewireserver.virtualserial.DWVSerialPorts;
@@ -59,7 +58,7 @@ public class DWAPISerial {
             try {
                 valno = Integer.parseInt(val);
             }
-            catch (NumberFormatException e) {
+            catch (NumberFormatException ignored) {
 
             }
 
@@ -158,78 +157,67 @@ public class DWAPISerial {
 
             // join em
 
-            Thread inputT = new Thread(new Runnable() {
+            Thread inputT = new Thread(() -> {
+                boolean wanttodie = false;
+                dwVSerialPorts.markConnected(vport);
 
+                while (!wanttodie) {
+                    int databyte = -1;
 
-                public void run() {
-                    boolean wanttodie = false;
-                    dwVSerialPorts.markConnected(vport);
+                    try {
+                        databyte = dwVSerialPorts.getPortOutput(vport).read();
+                        System.out.println("input: " + databyte);
+                    }
+                    catch (IOException | DWPortNotValidException e) {
+                        wanttodie = true;
+                    }
 
-                    while (!wanttodie) {
-                        int databyte = -1;
-
+                    if (databyte == -1) {
+                        wanttodie = true;
+                    }
+                    else {
                         try {
-                            databyte = dwVSerialPorts.getPortOutput(vport).read();
-                            System.out.println("input: " + databyte);
+                            sp.getOutputStream().write(databyte);
                         }
                         catch (IOException e) {
                             wanttodie = true;
                         }
-                        catch (DWPortNotValidException e) {
-                            wanttodie = true;
-                        }
-
-                        if (databyte == -1) {
-                            wanttodie = true;
-                        }
-                        else {
-                            try {
-                                sp.getOutputStream().write(databyte);
-                            }
-                            catch (IOException e) {
-                                wanttodie = true;
-                            }
-                        }
-
                     }
 
                 }
+
             });
 
             inputT.setDaemon(true);
             inputT.start();
 
 
-            Thread outputT = new Thread(new Runnable() {
+            Thread outputT = new Thread(() -> {
+                boolean wanttodie = false;
 
+                while (!wanttodie) {
+                    int databyte = -1;
 
-                public void run() {
-                    boolean wanttodie = false;
+                    try {
 
-                    while (!wanttodie) {
-                        int databyte = -1;
+                        databyte = sp.getInputStream().read();
+                        System.out.println("output: " + databyte);
+                    }
+                    catch (IOException e) {
+                        wanttodie = true;
+                    }
 
+                    if (databyte != -1) {
                         try {
-
-                            databyte = sp.getInputStream().read();
-                            System.out.println("output: " + databyte);
+                            dwVSerialPorts.writeToCoco(vport, (byte) (databyte & 0xff));
                         }
-                        catch (IOException e) {
+                        catch (DWPortNotValidException e) {
                             wanttodie = true;
                         }
-
-                        if (databyte != -1) {
-                            try {
-                                dwVSerialPorts.writeToCoco(vport, (byte) (databyte & 0xff));
-                            }
-                            catch (DWPortNotValidException e) {
-                                wanttodie = true;
-                            }
-                        }
-
                     }
 
                 }
+
             });
 
             outputT.setDaemon(true);
@@ -241,14 +229,11 @@ public class DWAPISerial {
         catch (Exception e) {
             return new DWCommandResponse(false, DWDefs.RC_SERIAL_PORTERROR, e.getClass().getSimpleName());
         }
-        catch (NoSuchPortException e) {
-            return new DWCommandResponse(false, DWDefs.RC_SERIAL_PORTERROR, e.getClass().getSimpleName());
-        }
 
     }
 
     private DWCommandResponse doCommandShow(String port) {
-        String res = "";
+        String res;
         boolean ok = true;
 
         try {
@@ -338,16 +323,16 @@ public class DWAPISerial {
     }
 
     private DWCommandResponse doCommandDevs() {
-        String res = "";
+        StringBuilder res = new StringBuilder();
 
         for (String p : DriveWireServer.getAvailableSerialPorts()) {
-            if (!res.equals("")) {
-                res += "|";
+            if (!res.toString().equals("")) {
+                res.append("|");
             }
-            res += p;
+            res.append(p);
         }
 
-        return new DWCommandResponse(res);
+        return new DWCommandResponse(res.toString());
     }
 
     public String[] getCommand() {

@@ -1,62 +1,51 @@
 package com.groupunix.drivewireserver.dwcommands;
 
-import java.util.Iterator;
-import java.util.List;
-
+import com.groupunix.drivewireserver.DriveWireServer;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 
-import com.groupunix.drivewireserver.DriveWireServer;
+import java.util.List;
 
 public class DWCmdMidiSynthShowProfiles extends DWCommand {
 
- 
-	public DWCmdMidiSynthShowProfiles(DWCommand parent)
-	{
-		setParentCmd(parent);
-	}
-	
-	public String getCommand() 
-	{
-		return "profiles";
-	}
+
+    DWCmdMidiSynthShowProfiles(DWCommand parent) {
+        setParentCmd(parent);
+    }
+
+    public String getCommand() {
+        return "profiles";
+    }
 
 
-	public String getShortHelp() 
-	{
-		return "Show internal synth profiles";
-	}
+    public String getShortHelp() {
+        return "Show internal synth profiles";
+    }
 
 
-	public String getUsage() 
-	{
-		return "dw midi synth show profiles";
-	}
+    public String getUsage() {
+        return "dw midi synth show profiles";
+    }
 
-	@SuppressWarnings("unchecked")
-	public DWCommandResponse parse(String cmdline) 
-	{
-		String text = new String();
-		
-		text = "\r\nAvailable sound translation profiles:\r\n\n";
-		
-		List<HierarchicalConfiguration> profiles = DriveWireServer.serverconfig.configurationsAt("midisynthprofile");
-    	
-		for(Iterator<HierarchicalConfiguration> it = profiles.iterator(); it.hasNext();)
-		{
-		    HierarchicalConfiguration mprof = it.next();
-		    
-		    text += String.format("%-10s: %-35s dev_adjust: %2d  gm_adjust: %2d", mprof.getString("[@name]", "n/a"), mprof.getString("[@desc]","n/a") , mprof.getInt("[@dev_adjust]",0) ,mprof.getInt("[@gm_adjust]", 0) );
-		    text += "\r\n";
-		}
-	
-		text += "\r\n";
-		
-		return(new DWCommandResponse(text));
-	}
+    @SuppressWarnings("unchecked")
+    public DWCommandResponse parse(String cmdline) {
+        StringBuilder text;
+
+        text = new StringBuilder("\r\nAvailable sound translation profiles:\r\n\n");
+
+        List<HierarchicalConfiguration> profiles = DriveWireServer.serverconfig.configurationsAt("midisynthprofile");
+
+        for (HierarchicalConfiguration mprof : profiles) {
+            text.append(String.format("%-10s: %-35s dev_adjust: %2d  gm_adjust: %2d", mprof.getString("[@name]", "n/a"), mprof.getString("[@desc]", "n/a"), mprof.getInt("[@dev_adjust]", 0), mprof.getInt("[@gm_adjust]", 0)));
+            text.append("\r\n");
+        }
+
+        text.append("\r\n");
+
+        return (new DWCommandResponse(text.toString()));
+    }
 
 
-	public boolean validate(String cmdline) 
-	{
-		return(true);
-	}
+    public boolean validate(String cmdline) {
+        return (true);
+    }
 }

@@ -1,12 +1,10 @@
 package com.groupunix.drivewireserver.dwexceptions;
 
-public class DWConnectionNotValidException  extends Exception 
-{
+public class DWConnectionNotValidException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public DWConnectionNotValidException(String msg)
-	{
-		super(msg);
-	}
+    public DWConnectionNotValidException(String msg) {
+        super(msg);
+    }
 }

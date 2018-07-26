@@ -6,39 +6,32 @@ import com.groupunix.drivewireserver.dwcommands.DWCommandResponse;
 
 public class UICmdServerConfigSerial extends DWCommand {
 
-	static final String command = "serial";
-	
-
-	public String getCommand() 
-	{
-		return command;
-	}
+    static final String command = "serial";
 
 
-	public DWCommandResponse parse(String cmdline)
-	{
-		String res = new String();
-
-		res = DriveWireServer.configserial + "";
-		
-		return(new DWCommandResponse(res));
-	}
+    public String getCommand() {
+        return command;
+    }
 
 
-	public String getShortHelp() 
-	{
-		return "Show server config serial#";
-	}
+    public DWCommandResponse parse(String cmdline) {
+        String res = DriveWireServer.configserial + "";
+
+        return (new DWCommandResponse(res));
+    }
 
 
-	public String getUsage() 
-	{
-		return "ui server config serial";
-	}
-	
-	public boolean validate(String cmdline) 
-	{
-		return(true);
-	}
-	
+    public String getShortHelp() {
+        return "Show server config serial#";
+    }
+
+
+    public String getUsage() {
+        return "ui server config serial";
+    }
+
+    public boolean validate(String cmdline) {
+        return (true);
+    }
+
 }

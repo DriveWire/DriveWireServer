@@ -7,53 +7,46 @@ import com.groupunix.drivewireserver.dwprotocolhandler.DWProtocol;
 
 public class UICmdServerConfig extends DWCommand {
 
-	static final String command = "config";
-
-		
-	public UICmdServerConfig(DWUIClientThread dwuiClientThread)
-	{
-
-		commands.addcommand(new UICmdServerConfigShow());
-		commands.addcommand(new UICmdServerConfigSet());
-		commands.addcommand(new UICmdServerConfigSerial());
-		commands.addcommand(new UICmdServerConfigWrite());
-		commands.addcommand(new UICmdServerConfigFreeze());
-	}
-
-	
-	public UICmdServerConfig(DWProtocol dwProto) 
-	{
-		commands.addcommand(new UICmdServerConfigShow());
-		commands.addcommand(new UICmdServerConfigSet());
-		commands.addcommand(new UICmdServerConfigWrite());
-	}
+    static final String command = "config";
 
 
-	public String getCommand() 
-	{
-		return command;
-	}
+    public UICmdServerConfig(DWUIClientThread dwuiClientThread) {
 
-	public DWCommandResponse parse(String cmdline)
-	{
-		return(commands.parse(cmdline));
-	}
-
-
-	public String getShortHelp() 
-	{
-		return "Configuration commands";
-	}
+        commands.addcommand(new UICmdServerConfigShow());
+        commands.addcommand(new UICmdServerConfigSet());
+        commands.addcommand(new UICmdServerConfigSerial());
+        commands.addcommand(new UICmdServerConfigWrite());
+        commands.addcommand(new UICmdServerConfigFreeze());
+    }
 
 
-	public String getUsage() 
-	{
-		return "ui server config [command]";
-	}
-	
-	public boolean validate(String cmdline) 
-	{
-		return(commands.validate(cmdline));
-	}
-	
+    public UICmdServerConfig(DWProtocol dwProto) {
+        commands.addcommand(new UICmdServerConfigShow());
+        commands.addcommand(new UICmdServerConfigSet());
+        commands.addcommand(new UICmdServerConfigWrite());
+    }
+
+
+    public String getCommand() {
+        return command;
+    }
+
+    public DWCommandResponse parse(String cmdline) {
+        return (commands.parse(cmdline));
+    }
+
+
+    public String getShortHelp() {
+        return "Configuration commands";
+    }
+
+
+    public String getUsage() {
+        return "ui server config [command]";
+    }
+
+    public boolean validate(String cmdline) {
+        return (commands.validate(cmdline));
+    }
+
 }

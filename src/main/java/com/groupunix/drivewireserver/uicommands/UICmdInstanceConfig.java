@@ -7,49 +7,42 @@ import com.groupunix.drivewireserver.dwprotocolhandler.DWProtocol;
 
 public class UICmdInstanceConfig extends DWCommand {
 
-	static final String command = "config";
-	
-		
-	public UICmdInstanceConfig(DWUIClientThread dwuiClientThread)
-	{
-
-		commands.addcommand(new UICmdInstanceConfigShow(dwuiClientThread));
-		commands.addcommand(new UICmdInstanceConfigSet(dwuiClientThread));
-	}
-
-	
-	public UICmdInstanceConfig(DWProtocol dwProto) 
-	{
-		commands.addcommand(new UICmdInstanceConfigShow(dwProto));
-		commands.addcommand(new UICmdInstanceConfigSet(dwProto));
-	}
+    static final String command = "config";
 
 
-	public String getCommand() 
-	{
-		return command;
-	}
+    public UICmdInstanceConfig(DWUIClientThread dwuiClientThread) {
 
-	public DWCommandResponse parse(String cmdline)
-	{
-		return(commands.parse(cmdline));
-	}
+        commands.addcommand(new UICmdInstanceConfigShow(dwuiClientThread));
+        commands.addcommand(new UICmdInstanceConfigSet(dwuiClientThread));
+    }
 
 
-	public String getShortHelp() 
-	{
-		return "Configuration commands";
-	}
+    public UICmdInstanceConfig(DWProtocol dwProto) {
+        commands.addcommand(new UICmdInstanceConfigShow(dwProto));
+        commands.addcommand(new UICmdInstanceConfigSet(dwProto));
+    }
 
 
-	public String getUsage() 
-	{
-		return "ui instance config [command]";
-	}
-	
-	public boolean validate(String cmdline) 
-	{
-		return(commands.validate(cmdline));
-	}
-	
+    public String getCommand() {
+        return command;
+    }
+
+    public DWCommandResponse parse(String cmdline) {
+        return (commands.parse(cmdline));
+    }
+
+
+    public String getShortHelp() {
+        return "Configuration commands";
+    }
+
+
+    public String getUsage() {
+        return "ui instance config [command]";
+    }
+
+    public boolean validate(String cmdline) {
+        return (commands.validate(cmdline));
+    }
+
 }

@@ -3,19 +3,16 @@ package com.groupunix.drivewireserver.dwprotocolhandler;
 
 import com.groupunix.drivewireserver.DWDefs;
 import com.groupunix.drivewireserver.MCXDefs;
-import com.groupunix.drivewireserver.exception.NoSuchPortException;
-import com.groupunix.drivewireserver.exception.PortInUseException;
-import com.groupunix.drivewireserver.exception.UnsupportedCommOperationException;
 import com.groupunix.drivewireserver.dwdisk.DWDiskDrives;
 import com.groupunix.drivewireserver.dwexceptions.*;
 import com.groupunix.drivewireserver.dwhelp.DWHelp;
+import com.groupunix.drivewireserver.exception.NoSuchPortException;
 import com.groupunix.drivewireserver.virtualprinter.DWVPrinter;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.GregorianCalendar;
-import java.util.TooManyListenersException;
 
 
 public class MCXProtocolHandler implements Runnable, DWProtocol {
@@ -34,7 +31,7 @@ public class MCXProtocolHandler implements Runnable, DWProtocol {
     private int lastError = 0;
     private byte[] lastLSN = new byte[3];
 
-    private GregorianCalendar dwinitTime = new GregorianCalendar();
+    private final GregorianCalendar dwinitTime = new GregorianCalendar();
 
     // serial port instance
 
@@ -50,8 +47,8 @@ public class MCXProtocolHandler implements Runnable, DWProtocol {
     // private static Thread readerthread;
     private boolean started = false;
 
-    private int handlerno;
-    private HierarchicalConfiguration config;
+    private final int handlerno;
+    private final HierarchicalConfiguration config;
 
 
     public MCXProtocolHandler(int handlerno, HierarchicalConfiguration hconf) {
@@ -370,7 +367,7 @@ public class MCXProtocolHandler implements Runnable, DWProtocol {
     private void DoOP_WRITE(byte opcode) {
         byte[] cocosum = new byte[2];
         byte[] responsebuf = new byte[262];
-        byte response = 0;
+        byte response;
         byte[] sector = new byte[256];
 
         try {
@@ -426,11 +423,6 @@ public class MCXProtocolHandler implements Runnable, DWProtocol {
             response = DWDefs.DWERROR_NOTREADY;
             logger.warn(e1.getMessage());
         }
-        catch (DWDriveNotValidException e2) {
-            // basically the same as not ready
-            response = DWDefs.DWERROR_NOTREADY;
-            logger.warn(e2.getMessage());
-        }
         catch (DWDriveWriteProtectedException e3) {
             // hopefully this is appropriate
             response = DWDefs.DWERROR_WP;
@@ -441,25 +433,23 @@ public class MCXProtocolHandler implements Runnable, DWProtocol {
             response = DWDefs.DWERROR_WRITE;
             logger.error(e4.getMessage());
         }
-        catch (DWInvalidSectorException e5) {
+        catch (DWInvalidSectorException | DWSeekPastEndOfDeviceException e5) {
             response = DWDefs.DWERROR_WRITE;
             logger.warn(e5.getMessage());
         }
-        catch (DWSeekPastEndOfDeviceException e6) {
-            response = DWDefs.DWERROR_WRITE;
-            logger.warn(e6.getMessage());
-        }
 
         // record error
-        if (response != DWDefs.DWOK)
+        if (response != DWDefs.DWOK) {
             lastError = response;
+        }
 
         // send response
         protodev.comWrite1(response, false);
 
         // Increment sectorsWritten count
-        if (response == DWDefs.DWOK)
+        if (response == DWDefs.DWOK) {
             sectorsWritten++;
+        }
 
         if (opcode == DWDefs.OP_REWRITE) {
             writeRetries++;
@@ -473,7 +463,6 @@ public class MCXProtocolHandler implements Runnable, DWProtocol {
             }
         }
 
-        return;
     }
 
 
@@ -519,7 +508,7 @@ public class MCXProtocolHandler implements Runnable, DWProtocol {
         /* Check to see if numbytes is odd or even */
         while (numbytes > 0) {
             numbytes--;
-            lastChecksum += (int) (data[numbytes] & 0xFF);
+            lastChecksum += data[numbytes] & 0xFF;
         }
 
         return (lastChecksum);
@@ -598,8 +587,9 @@ public class MCXProtocolHandler implements Runnable, DWProtocol {
 
     private void setupProtocolDevice() {
 
-        if (protodev != null)
+        if (protodev != null) {
             protodev.shutdown();
+        }
 
         if (config.getString("DeviceType", "serial").equalsIgnoreCase("serial")) {
 
@@ -612,22 +602,6 @@ public class MCXProtocolHandler implements Runnable, DWProtocol {
                 catch (NoSuchPortException e1) {
                     //wanttodie = true; lets keep on living and see how that goes
                     logger.error("handler #" + handlerno + ": Serial device '" + config.getString("SerialDevice") + "' not found");
-                }
-                catch (PortInUseException e2) {
-                    //wanttodie = true;
-                    logger.error("handler #" + handlerno + ": Serial device '" + config.getString("SerialDevice") + "' in use");
-                }
-                catch (UnsupportedCommOperationException e3) {
-                    //wanttodie = true;
-                    logger.error("handler #" + handlerno + ": Unsupported comm operation while opening serial port '" + config.getString("SerialDevice") + "'");
-                }
-                catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                catch (TooManyListenersException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
                 }
             }
             else {
@@ -673,12 +647,12 @@ public class MCXProtocolHandler implements Runnable, DWProtocol {
 
 
     public String getStatusText() {
-        String text = new String();
+        String text = "";
 
         text += "Last OpCode:   " + DWUtils.prettyOP(getLastOpcode()) + "\r\n";
         text += "Last Drive:    " + getLastDrive() + "\r\n";
-        text += "Last LSN:      " + getLastLSN() + "\r\n";
-        text += "Last Error:    " + ((int) getLastError() & 0xFF) + "\r\n";
+        text += "Last LSN:      " + new String(getLastLSN()) + "\r\n";
+        text += "Last Error:    " + (getLastError() & 0xFF) + "\r\n";
 
         return (text);
     }

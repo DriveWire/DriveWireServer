@@ -1,26 +1,35 @@
 package com.groupunix.drivewireserver.dwprotocolhandler;
 
+import com.groupunix.drivewireserver.dwexceptions.DWCommTimeOutException;
+
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.groupunix.drivewireserver.dwexceptions.DWCommTimeOutException;
 
+public interface DWProtocolDevice {
 
+    boolean connected();
 
-public interface DWProtocolDevice 
-{
+    void close();
 
-	public boolean connected();
-	public void close();
-	public void shutdown();
-	public void comWrite(byte[] data, int len, boolean prefix);
-	public void comWrite1(int data, boolean prefix);
-	public byte[] comRead(int len) throws IOException, DWCommTimeOutException; 
-	public int comRead1(boolean timeout) throws IOException, DWCommTimeOutException; 
-	public int getRate();
-	public String getDeviceType();
-	public String getDeviceName();
-	public String getClient();
-	public InputStream getInputStream();
+    void shutdown();
+
+    void comWrite(byte[] data, int len, boolean prefix);
+
+    void comWrite1(int data, boolean prefix);
+
+    byte[] comRead(int len) throws IOException, DWCommTimeOutException;
+
+    int comRead1(boolean timeout) throws IOException, DWCommTimeOutException;
+
+    int getRate();
+
+    String getDeviceType();
+
+    String getDeviceName();
+
+    String getClient();
+
+    InputStream getInputStream();
 
 }

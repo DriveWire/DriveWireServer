@@ -3,115 +3,96 @@ package com.groupunix.drivewireserver.dwdisk.filesystem;
 import com.groupunix.drivewireserver.dwprotocolhandler.DWUtils;
 
 
-public class DWRBFFileSystemDirEntry extends DWFileSystemDirEntry
-{
+public class DWRBFFileSystemDirEntry extends DWFileSystemDirEntry {
 
-	private String filename;
-	private int fdlsn;
-	private DWRBFFileDescriptor fd;
+    private final String filename;
+    private int fdlsn;
+    private DWRBFFileDescriptor fd;
 
-	public DWRBFFileSystemDirEntry(String fn, int fd_lsn, DWRBFFileDescriptor fd)
-	{
-		super(null);
-		
-		this.filename = fn;
-		this.setFDLSN(fd_lsn);
-		this.setFD(fd);
-	}
+    DWRBFFileSystemDirEntry(String fn, int fd_lsn, DWRBFFileDescriptor fd) {
+        super(null);
 
-	@Override
-	public String getFileName()
-	{
-		return this.filename;
-	}
+        this.filename = fn;
+        this.setFDLSN(fd_lsn);
+        this.setFD(fd);
+    }
 
-	@Override
-	public String getFileExt()
-	{
-		String res = "";
-		
-		int dot = this.filename.lastIndexOf(".");
-		
-		if ((dot > 0) && (dot < this.filename.length()-1))
-		{
-			res = this.filename.substring(dot+1);
-		}
-		
-		return res;
-	}
+    @Override
+    public String getFileName() {
+        return this.filename;
+    }
 
-	@Override
-	public String getFilePath()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getFileExt() {
+        String res = "";
 
-	@Override
-	public String getPrettyFileType()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
+        int dot = this.filename.lastIndexOf(".");
 
-	@Override
-	public int getFileType()
-	{
-		// TODO Auto-generated method stub
-		return 0;
-	}
+        if ((dot > 0) && (dot < this.filename.length() - 1)) {
+            res = this.filename.substring(dot + 1);
+        }
 
-	@Override
-	public DWFileSystemDirEntry getParentEntry()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
+        return res;
+    }
 
-	@Override
-	public boolean isDirectory()
-	{
-		if ((this.fd.getAttributes() & 0x80) == 0x80)
-			return true;
-		
-		return false;
-	}
+    @Override
+    public String getFilePath() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public boolean isAscii()
-	{
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public String getPrettyFileType() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	public void setFD(DWRBFFileDescriptor fd)
-	{
-		this.fd = fd;
-	}
+    @Override
+    public int getFileType() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-	public DWRBFFileDescriptor getFD()
-	{
-		return fd;
-	}
+    @Override
+    public DWFileSystemDirEntry getParentEntry() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	public void setFDLSN(int fdlsn)
-	{
-		this.fdlsn = fdlsn;
-	}
+    @Override
+    public boolean isDirectory() {
+        return (this.fd.getAttributes() & 0x80) == 0x80;
 
-	public int getFDLSN()
-	{
-		return fdlsn;
-	}
+    }
 
-	public String getPrettyDateModified()
-	{
-		return DWUtils.pretty5ByteDateTime(this.fd.getDateModified());
-	}
+    @Override
+    public boolean isAscii() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-	public String getPrettyDateCreated()
-	{
-		 return DWUtils.pretty3ByteDate(this.fd.getDateCreated());
-	}
+    private void setFD(DWRBFFileDescriptor fd) {
+        this.fd = fd;
+    }
+
+    DWRBFFileDescriptor getFD() {
+        return fd;
+    }
+
+    private void setFDLSN(int fdlsn) {
+        this.fdlsn = fdlsn;
+    }
+
+    public int getFDLSN() {
+        return fdlsn;
+    }
+
+    public String getPrettyDateModified() {
+        return DWUtils.pretty5ByteDateTime(this.fd.getDateModified());
+    }
+
+    public String getPrettyDateCreated() {
+        return DWUtils.pretty3ByteDate(this.fd.getDateCreated());
+    }
 
 }

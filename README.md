@@ -26,6 +26,18 @@ Clone (download) the DriveWire source
 git clone <repository url>
 ```
 
+Verify that you have at least Java JDK 8 or higher installed:
+
+```
+java -version
+javac -version
+```
+Verify that you have gradle installed (tested with gradle 4.9, gradle 4+ should work):
+
+```
+gradle -version
+```
+
 Change directory into the project and execute
 
 ```
